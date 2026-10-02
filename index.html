@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebHocTap - Nền tảng học tập thông minh</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="app-container">
+    <!-- ===== LEFT SIDEBAR ===== -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">📚 <span>WebHocTap</span></div>
+        <nav class="sidebar-nav">
+            <div class="nav-item active" data-section="study-manager">
+                <span class="nav-icon">📖</span><span class="nav-label">Quản lý môn học</span>
+            </div>
+            <div class="nav-item" data-section="time-focus">
+                <span class="nav-icon">⏰</span><span class="nav-label">Thời gian & Tập trung</span>
+            </div>
+            <div class="nav-item" data-section="analytics">
+                <span class="nav-icon">📊</span><span class="nav-label">Báo cáo học tập</span>
+            </div>
+            <div class="nav-item" data-section="charity">
+                <span class="nav-icon">🌿</span><span class="nav-label">Trạm góp lá</span>
+            </div>
+            <div class="nav-item" data-section="marketplace">
+                <span class="nav-icon">🏪</span><span class="nav-label">Sàn tri thức</span>
+            </div>
+            <div class="nav-item" data-section="study-hub">
+                <span class="nav-icon">👥</span><span class="nav-label">Kết nối bạn học</span>
+            </div>
+        </nav>
+        <div class="sidebar-footer">
+            <button class="theme-toggle" id="themeToggle" title="Chế độ sáng/tối">🌙 Dark Mode</button>
+            <button class="settings-btn" title="Cài đặt">⚙️ Cài đặt</button>
+        </div>
+    </aside>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <div class="main-content">
+        <!-- TOP BAR -->
+        <header class="top-bar">
+            <button class="menu-toggle" id="menuToggle">☰</button>
+            <div class="search-bar">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="globalSearch" placeholder="Tìm kiếm tài liệu, môn học, bài viết...">
+            </div>
+            <button class="ai-voice-btn" id="aiVoiceBtn">🎤 Ra lệnh AI</button>
+            <div class="coin-wallet" id="coinWalletWidget">🍃 <span id="topBarCoins">1.250</span> xu</div>
+            <button class="notification-btn" id="notifBtn">🔔<span class="notification-badge">3</span></button>
+            <div class="user-avatar" id="userAvatar">👤<span class="user-name">Sinh viên</span></div>
+        </header>
+
+        <!-- ========== SECTION 1: STUDY MANAGER ========== -->
+        <section id="section-study-manager" class="content-section active">
+            <div class="section-header">
+                <h1 class="section-title">📖 Quản lý Môn Học</h1>
+                <button class="btn btn-primary" onclick="openModal('modal-create-subject')">+ Tạo thư mục mới</button>
+            </div>
+            <!-- Subject Grid -->
+            <div id="subjectGrid" class="grid grid-4">
+                <!-- Rendered by JS -->
+            </div>
+            <!-- Subject Detail View -->
+            <div id="subjectDetail" class="subject-detail" style="display:none;">
+                <div class="subject-detail-header">
+                    <button class="back-btn" id="backToSubjects">← Quay lại</button>
+                    <h2 id="detailSubjectName"></h2>
+                </div>
+                <div class="tab-bar">
+                    <div class="tab-item active" data-tab="tab-files">📁 Tài liệu</div>
+                    <div class="tab-item" data-tab="tab-notes">✏️ Ghi chú</div>
+                    <div class="tab-item" data-tab="tab-projects">📋 Đồ án</div>
+                </div>
+                <!-- Tab: Files -->
+                <div id="tab-files" class="tab-content active">
+                    <div class="upload-area" id="fileUploadArea">
+                        <div class="upload-icon">📤</div>
+                        <p>Kéo thả file hoặc <strong>bấm để tải lên</strong></p>
+                        <p class="text-muted">PDF, PPTX, DOCX, ảnh (tối đa 50MB)</p>
+                        <input type="file" id="fileInput" style="display:none" multiple>
+                    </div>
+                    <div id="fileList" class="file-list"></div>
+                    <h3 style="margin:20px 0 10px;">🔗 Đường dẫn đã lưu</h3>
+                    <div class="link-save-form" style="display:flex;gap:8px;margin-bottom:16px;">
+                        <input type="text" id="linkTitleInput" class="form-input" placeholder="Tên đường dẫn" style="flex:1">
+                        <input type="url" id="linkUrlInput" class="form-input" placeholder="https://..." style="flex:2">
+                        <button class="btn btn-primary btn-sm" onclick="StudyManager.addLink()">Lưu link</button>
+                    </div>
+                    <div id="linkList"></div>
+                    <h3 style="margin:20px 0 10px;">🖼️ Bộ sưu tập hình ảnh</h3>
+                    <div id="imageGallery" class="image-gallery"></div>
+                </div>
+                <!-- Tab: Notes -->
+                <div id="tab-notes" class="tab-content" style="display:none;">
+                    <div class="editor-toolbar">
+                        <button onclick="document.execCommand('bold')" title="Bold"><strong>B</strong></button>
+                        <button onclick="document.execCommand('italic')" title="Italic"><em>I</em></button>
+                        <button onclick="document.execCommand('formatBlock','false','h2')" title="Heading">H</button>
+                        <button onclick="document.execCommand('insertUnorderedList')" title="Danh sách">☰</button>
+                        <button onclick="StudyManager.insertChecklist()" title="Checklist">☑️</button>
+                        <button onclick="document.execCommand('insertImage',false,prompt('URL ảnh:'))" title="Chèn ảnh">🖼️</button>
+                    </div>
+                    <div id="noteEditor" class="editor-content" contenteditable="true">
+                        <p>Bắt đầu ghi chú tại đây...</p>
+                    </div>
+                    <button class="btn btn-primary" style="margin-top:12px;" onclick="StudyManager.saveNote()">💾 Lưu ghi chú</button>
+                </div>
+                <!-- Tab: Projects -->
+                <div id="tab-projects" class="tab-content" style="display:none;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+                        <h3>📋 Bảng Kanban</h3>
+                        <button class="btn btn-primary btn-sm" onclick="openModal('modal-create-task')">+ Thêm task</button>
+                    </div>
+                    <div id="kanbanBoard" class="kanban-board"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========== SECTION 2: TIME & FOCUS ========== -->
+        <section id="section-time-focus" class="content-section" style="display:none;">
+            <div class="section-header">
+                <h1 class="section-title">⏰ Thời gian & Tập trung</h1>
+            </div>
+            <!-- AI Command Bar -->
+            <div class="ai-command-bar card">
+                <div class="ai-command-content">
+                    <div class="waveform" id="waveform">
+                        <div class="waveform-bar"></div><div class="waveform-bar"></div><div class="waveform-bar"></div>
+                        <div class="waveform-bar"></div><div class="waveform-bar"></div><div class="waveform-bar"></div>
+                        <div class="waveform-bar"></div><div class="waveform-bar"></div><div class="waveform-bar"></div>
+                        <div class="waveform-bar"></div>
+                    </div>
+                    <p class="ai-hint">Nói lệnh để AI tự lên lịch... Ví dụ: "Thêm deadline Mạng máy tính ngày 15/10"</p>
+                    <button class="btn btn-danger btn-lg" id="aiMicBtn">🎤 Bắt đầu nói</button>
+                </div>
+            </div>
+
+            <div class="grid grid-2" style="margin-top:20px;">
+                <!-- Pomodoro Timer -->
+                <div class="card pomodoro-zone">
+                    <h2>🍅 Pomodoro Timer</h2>
+                    <div class="timer-circle" id="timerCircle">
+                        <span class="timer-display" id="timerDisplay">25:00</span>
+                    </div>
+                    <div class="timer-subject">
+                        <select id="pomodoroSubject" class="form-select" style="max-width:250px;margin:0 auto 16px;">
+                            <option value="">-- Chọn môn học --</option>
+                        </select>
+                    </div>
+                    <div class="duration-toggle">
+                        <button class="btn btn-sm btn-primary active" data-duration="25">25 phút</button>
+                        <button class="btn btn-sm btn-secondary" data-duration="50">50 phút</button>
+                    </div>
+                    <div class="timer-controls" style="margin-top:16px;">
+                        <button class="btn btn-primary btn-lg" id="timerStart">▶ Bắt đầu</button>
+                        <button class="btn btn-secondary btn-lg" id="timerPause" style="display:none;">⏸ Tạm dừng</button>
+                        <button class="btn btn-secondary btn-lg" id="timerReset">↻ Đặt lại</button>
+                    </div>
+                    <p class="session-counter" style="margin-top:12px;color:var(--text-secondary);">Phiên: <span id="sessionCount">0</span>/4</p>
+                </div>
+
+                <!-- Lo-Fi Audio Player -->
+                <div class="card">
+                    <h2>🎵 Nhạc nền tập trung</h2>
+                    <div class="audio-player">
+                        <div class="audio-channels">
+                            <button class="channel-btn active" data-channel="white-noise">🌊 Tiếng ồn trắng</button>
+                            <button class="channel-btn" data-channel="lofi">🎵 Nhạc Lo-Fi</button>
+                            <button class="channel-btn" data-channel="brain">🧠 Sóng não</button>
+                        </div>
+                        <div class="visualizer-bars" id="visualizerBars">
+                            <div class="visualizer-bar"></div><div class="visualizer-bar"></div><div class="visualizer-bar"></div>
+                            <div class="visualizer-bar"></div><div class="visualizer-bar"></div><div class="visualizer-bar"></div>
+                            <div class="visualizer-bar"></div><div class="visualizer-bar"></div><div class="visualizer-bar"></div>
+                            <div class="visualizer-bar"></div><div class="visualizer-bar"></div><div class="visualizer-bar"></div>
+                        </div>
+                        <div class="audio-controls">
+                            <button class="btn btn-primary" id="audioPlayBtn">▶ Phát</button>
+                            <div class="volume-control">
+                                <span>🔊</span>
+                                <input type="range" id="volumeSlider" min="0" max="100" value="50">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Deadline Countdown -->
+            <h2 style="margin:24px 0 16px;">⏳ Deadline đang đến</h2>
+            <div id="deadlineCards" class="grid grid-3"></div>
+
+            <!-- Weekly Calendar -->
+            <h2 style="margin:24px 0 16px;">📅 Lịch tuần này</h2>
+            <div id="weeklyCalendar" class="card">
+                <div class="calendar-grid" id="calendarGrid"></div>
+            </div>
+        </section>
+
+        <!-- ========== SECTION 3: ANALYTICS ========== -->
+        <section id="section-analytics" class="content-section" style="display:none;">
+            <div class="section-header">
+                <h1 class="section-title">📊 Báo cáo Học tập</h1>
+                <div class="filter-bar">
+                    <button class="filter-btn active" data-period="week">Tuần</button>
+                    <button class="filter-btn" data-period="month">Tháng</button>
+                    <button class="filter-btn" data-period="all">Tất cả</button>
+                </div>
+            </div>
+            <!-- Stat Cards -->
+            <div class="grid grid-4" id="statCards">
+                <div class="card stat-card"><div class="stat-value" id="statTotalHours">40</div><div class="stat-label">Tổng giờ học</div></div>
+                <div class="card stat-card"><div class="stat-value" id="statAvgDay">2.7</div><div class="stat-label">TB mỗi ngày (giờ)</div></div>
+                <div class="card stat-card"><div class="stat-value" id="statStreak">12</div><div class="stat-label">Streak (ngày)</div></div>
+                <div class="card stat-card"><div class="stat-value" id="statCompletion">75%</div><div class="stat-label">Tỷ lệ hoàn thành</div></div>
+            </div>
+            <div class="grid grid-2" style="margin-top:20px;">
+                <!-- Study Hours Chart -->
+                <div class="chart-container card">
+                    <h3 class="chart-title">📈 Thời gian học tập (giờ)</h3>
+                    <div class="chart-area" id="studyHoursChart"></div>
+                </div>
+                <!-- Deadline Stats -->
+                <div class="chart-container card">
+                    <h3 class="chart-title">✅ Thống kê Deadline</h3>
+                    <div class="chart-area" id="deadlineStatsChart"></div>
+                </div>
+            </div>
+            <!-- Subject Time -->
+            <div class="chart-container card" style="margin-top:20px;">
+                <h3 class="chart-title">🥧 Phân bổ thời gian theo môn</h3>
+                <div class="chart-area" id="subjectTimeChart" style="display:flex;align-items:center;justify-content:center;gap:40px;"></div>
+            </div>
+        </section>
+
+        <!-- ========== SECTION 4: CHARITY HUB ========== -->
+        <section id="section-charity" class="content-section" style="display:none;">
+            <div class="section-header">
+                <h1 class="section-title">🌿 Trạm Góp Lá Từ Thiện</h1>
+            </div>
+            <div class="grid grid-2">
+                <!-- Coin Wallet -->
+                <div class="card">
+                    <h2>🍃 Ví Đồng Xu</h2>
+                    <div class="wallet-display">
+                        <div class="wallet-balance" id="walletBalance">1.250</div>
+                        <div class="wallet-unit">đồng xu 🍃</div>
+                    </div>
+                    <h3 style="margin:20px 0 12px;">Lịch sử nhận xu</h3>
+                    <div id="earningHistory" class="earning-history"></div>
+                </div>
+                <!-- Donation Portal -->
+                <div class="card">
+                    <h2>🎁 Góp Đồng Xu</h2>
+                    <p style="color:var(--text-secondary);margin-bottom:16px;">Góp xu vào Dự Án Từ Thiện "Trồng Cây Xanh Cho Trường Học"</p>
+                    <div class="donation-form">
+                        <input type="number" id="donationAmount" class="form-input" placeholder="Nhập số xu muốn góp..." min="1">
+                        <button class="btn btn-primary btn-lg" style="margin-top:12px;width:100%;" onclick="CharityHub.donate()">🍃 Góp đồng xu</button>
+                    </div>
+                    <div class="donation-stats" style="margin-top:20px;text-align:center;">
+                        <p style="color:var(--text-secondary);">Cộng đồng đã góp</p>
+                        <div class="stat-value" id="communityDonated" style="color:var(--accent-green);">15.000</div>
+                        <p style="color:var(--text-secondary);">đồng xu 🍃</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Charity Tree -->
+            <div class="card charity-tree" style="margin-top:20px;">
+                <h2>🌳 Cây Từ Thiện Cộng Đồng</h2>
+                <div class="tree-visual" id="treeVisual">🌿</div>
+                <div class="tree-stage" id="treeStage">Cây non</div>
+                <div class="progress-bar" style="max-width:400px;margin:16px auto;">
+                    <div class="progress-fill" id="treeProgress" style="width:50%;"></div>
+                </div>
+                <p id="treeProgressText" style="color:var(--text-secondary);">15.000 / 30.000 xu đến giai đoạn tiếp theo</p>
+                <div class="tree-stats">
+                    <div><span class="leaf-counter" id="leafCount">1.500</span><br><small>tổng lá 🍃</small></div>
+                    <div><span class="leaf-counter" id="donorCount">234</span><br><small>người góp ❤️</small></div>
+                </div>
+            </div>
+            <!-- Ad Watch -->
+            <div class="card" style="margin-top:20px;">
+                <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;">
+                    <div>
+                        <h3>🎬 Xem Quảng Cáo Nhận Xu</h3>
+                        <p style="color:var(--text-secondary);">Xem video ngắn để nhận thêm xu góp từ thiện</p>
+                    </div>
+                    <div style="text-align:center;">
+                        <button class="btn btn-primary btn-lg" id="watchAdBtn" onclick="CharityHub.watchAd()">🎬 Xem quảng cáo nhận 5 xu</button>
+                        <p style="color:var(--text-secondary);margin-top:8px;">Còn <span id="adWatchesLeft">5</span>/5 lượt hôm nay</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========== SECTION 5: MARKETPLACE ========== -->
+        <section id="section-marketplace" class="content-section" style="display:none;">
+            <div class="section-header">
+                <h1 class="section-title">🏪 Sàn Tri Thức</h1>
+                <button class="btn btn-primary" onclick="openModal('modal-post-listing')">+ Đăng tin</button>
+            </div>
+            <div style="display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap;">
+                <input type="text" id="marketSearch" class="form-input" placeholder="Tìm kiếm sản phẩm..." style="flex:1;min-width:200px;">
+                <div class="filter-bar" id="marketFilters">
+                    <button class="filter-btn active" data-category="all">Tất cả</button>
+                    <button class="filter-btn" data-category="sach">📚 Sách</button>
+                    <button class="filter-btn" data-category="tai-lieu">📝 Tài liệu</button>
+                    <button class="filter-btn" data-category="thiet-bi">🔧 Thiết bị</button>
+                    <button class="filter-btn" data-category="khoa-hoc">🎓 Khóa học</button>
+                </div>
+            </div>
+            <div id="productGrid" class="grid grid-3"></div>
+
+            <h2 style="margin:32px 0 16px;">📚 Tài liệu chia sẻ từ cộng đồng</h2>
+            <div id="sharedDocsGrid" class="grid grid-3"></div>
+        </section>
+
+        <!-- ========== SECTION 6: STUDY HUB ========== -->
+        <section id="section-study-hub" class="content-section" style="display:none;">
+            <div class="section-header">
+                <h1 class="section-title">👥 Kết nối Bạn Học</h1>
+            </div>
+
+            <!-- AI Matchmaking -->
+            <div class="card" style="margin-bottom:20px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;">
+                    <div>
+                        <h2>🤝 Ghép Bạn Học (AI Match)</h2>
+                        <p style="color:var(--text-secondary);">AI sẽ tìm bạn học cùng môn hoặc cùng mục tiêu</p>
+                        <div class="match-criteria" style="margin-top:8px;">
+                            <span class="tag">TOEIC</span><span class="tag">JLPT</span><span class="tag">IT</span>
+                            <span class="tag">Data Science</span><span class="tag">CCNA</span>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary btn-lg" id="matchBtn" onclick="StudyHub.matchBuddy()">🤝 Ghép bạn học</button>
+                </div>
+            </div>
+            <div id="matchResults" class="grid grid-2" style="margin-bottom:24px;"></div>
+
+            <!-- Voice Call Rooms -->
+            <h2 style="margin-bottom:16px;">📞 Phòng Học Online</h2>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+                <p style="color:var(--text-secondary);">Tham gia hoặc tạo phòng học nhóm trực tuyến</p>
+                <button class="btn btn-primary" onclick="StudyHub.createRoom()">+ Tạo phòng mới</button>
+            </div>
+            <div id="roomList" class="grid grid-3" style="margin-bottom:24px;"></div>
+
+            <!-- Q&A Board -->
+            <h2 style="margin-bottom:16px;">❓ Diễn đàn Giải bài tập</h2>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+                <p style="color:var(--text-secondary);">Hỏi & đáp cùng cộng đồng</p>
+                <button class="btn btn-primary" onclick="openModal('modal-ask-question')">+ Đăng câu hỏi</button>
+            </div>
+            <div id="qaBoard" style="margin-bottom:24px;"></div>
+
+            <!-- Post-it Wall -->
+            <h2 style="margin-bottom:16px;">💌 Tường Tâm Sự Ẩn Danh</h2>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+                <p style="color:var(--text-secondary);">Chia sẻ, động viên & giải tỏa áp lực</p>
+                <button class="btn btn-primary" onclick="openModal('modal-write-postit')">✏️ Viết tâm sự</button>
+            </div>
+            <div id="postitWall" class="postit-wall"></div>
+        </section>
+    </div>
+</div>
+
+<!-- ===== MODALS ===== -->
+<!-- Create Subject Modal -->
+<div class="modal-overlay" id="modal-create-subject">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">📁 Tạo thư mục môn học</h2>
+            <button class="modal-close" onclick="closeModal('modal-create-subject')">✕</button>
+        </div>
+        <div class="form-group">
+            <label class="form-label">Tên môn học</label>
+            <input type="text" id="newSubjectName" class="form-input" placeholder="VD: Trí tuệ nhân tạo">
+        </div>
+        <div class="form-group">
+            <label class="form-label">Biểu tượng</label>
+            <div class="icon-picker" id="iconPicker">
+                <span class="icon-option selected" data-icon="📘">📘</span>
+                <span class="icon-option" data-icon="💻">💻</span>
+                <span class="icon-option" data-icon="🔬">🔬</span>
+                <span class="icon-option" data-icon="📐">📐</span>
+                <span class="icon-option" data-icon="🌐">🌐</span>
+                <span class="icon-option" data-icon="🎨">🎨</span>
+                <span class="icon-option" data-icon="📊">📊</span>
+                <span class="icon-option" data-icon="🇯🇵">🇯🇵</span>
+                <span class="icon-option" data-icon="🇬🇧">🇬🇧</span>
+                <span class="icon-option" data-icon="🧮">🧮</span>
+            </div>
+        </div>
+        <button class="btn btn-primary btn-lg" style="width:100%;" onclick="StudyManager.createSubject()">Tạo thư mục</button>
+    </div>
+</div>
+
+<!-- Create Task Modal -->
+<div class="modal-overlay" id="modal-create-task">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">📋 Thêm Task mới</h2>
+            <button class="modal-close" onclick="closeModal('modal-create-task')">✕</button>
+        </div>
+        <div class="form-group">
+            <label class="form-label">Tên task</label>
+            <input type="text" id="newTaskTitle" class="form-input" placeholder="VD: Bài tập chương 3">
+        </div>
+        <div class="form-group">
+            <label class="form-label">Deadline</label>
+            <input type="date" id="newTaskDeadline" class="form-input">
+        </div>
+        <div class="form-group">
+            <label class="form-label">Trạng thái</label>
+            <select id="newTaskStatus" class="form-select">
+                <option value="todo">Chưa làm</option>
+                <option value="doing">Đang làm</option>
+                <option value="done">Hoàn thành</option>
+            </select>
+        </div>
+        <button class="btn btn-primary btn-lg" style="width:100%;" onclick="StudyManager.createTask()">Thêm task</button>
+    </div>
+</div>
+
+<!-- Post Listing Modal -->
+<div class="modal-overlay" id="modal-post-listing">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">🏪 Đăng tin thanh lý</h2>
+            <button class="modal-close" onclick="closeModal('modal-post-listing')">✕</button>
+        </div>
+        <div class="form-group">
+            <label class="form-label">Tiêu đề</label>
+            <input type="text" id="listingTitle" class="form-input" placeholder="VD: Sách Giải tích 1">
+        </div>
+        <div class="form-group">
+            <label class="form-label">Mô tả</label>
+            <textarea id="listingDesc" class="form-textarea" placeholder="Mô tả chi tiết sản phẩm..."></textarea>
+        </div>
+        <div class="form-group">
+            <label class="form-label">Giá (VNĐ)</label>
+            <input type="number" id="listingPrice" class="form-input" placeholder="VD: 50000">
+        </div>
+        <div class="form-group">
+            <label class="form-label">Danh mục</label>
+            <select id="listingCategory" class="form-select">
+                <option value="sach">📚 Sách</option>
+                <option value="tai-lieu">📝 Tài liệu</option>
+                <option value="thiet-bi">🔧 Thiết bị</option>
+                <option value="khoa-hoc">🎓 Khóa học</option>
+            </select>
+        </div>
+        <button class="btn btn-primary btn-lg" style="width:100%;" onclick="Marketplace.postListing()">Đăng tin</button>
+    </div>
+</div>
+
+<!-- Ask Question Modal -->
+<div class="modal-overlay" id="modal-ask-question">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">❓ Đăng câu hỏi</h2>
+            <button class="modal-close" onclick="closeModal('modal-ask-question')">✕</button>
+        </div>
+        <div class="form-group">
+            <label class="form-label">Môn học</label>
+            <select id="questionSubject" class="form-select">
+                <option>Mạng máy tính</option>
+                <option>Tiếng Nhật N3</option>
+                <option>Lập trình Web</option>
+                <option>Cơ sở dữ liệu</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label class="form-label">Nội dung câu hỏi</label>
+            <textarea id="questionText" class="form-textarea" placeholder="Mô tả chi tiết câu hỏi của bạn..."></textarea>
+        </div>
+        <button class="btn btn-primary btn-lg" style="width:100%;" onclick="StudyHub.askQuestion()">Đăng câu hỏi</button>
+    </div>
+</div>
+
+<!-- Write Post-it Modal -->
+<div class="modal-overlay" id="modal-write-postit">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">✏️ Viết tâm sự ẩn danh</h2>
+            <button class="modal-close" onclick="closeModal('modal-write-postit')">✕</button>
+        </div>
+        <div class="form-group">
+            <label class="form-label">Nội dung</label>
+            <textarea id="postitText" class="form-textarea" placeholder="Chia sẻ tâm sự của bạn..."></textarea>
+        </div>
+        <div class="form-group">
+            <label class="form-label">Màu giấy</label>
+            <div class="color-picker" id="postitColorPicker">
+                <span class="color-option selected" data-color="#FFEB3B" style="background:#FFEB3B;"></span>
+                <span class="color-option" data-color="#FF9800" style="background:#FF9800;"></span>
+                <span class="color-option" data-color="#E91E63" style="background:#E91E63;"></span>
+                <span class="color-option" data-color="#4CAF50" style="background:#4CAF50;"></span>
+                <span class="color-option" data-color="#2196F3" style="background:#2196F3;"></span>
+                <span class="color-option" data-color="#9C27B0" style="background:#9C27B0;"></span>
+            </div>
+        </div>
+        <button class="btn btn-primary btn-lg" style="width:100%;" onclick="StudyHub.writePostit()">Đăng tâm sự</button>
+    </div>
+</div>
+
+<!-- AI Command Result Modal -->
+<div class="modal-overlay" id="modal-ai-result">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">🤖 AI đã phân tích lệnh</h2>
+            <button class="modal-close" onclick="closeModal('modal-ai-result')">✕</button>
+        </div>
+        <div id="aiResultContent"></div>
+        <button class="btn btn-primary btn-lg" style="width:100%;margin-top:16px;" onclick="closeModal('modal-ai-result')">✓ Xác nhận</button>
+    </div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script src="js/app.js"></script>
+<script src="js/study-manager.js"></script>
+<script src="js/time-focus.js"></script>
+<script src="js/analytics.js"></script>
+<script src="js/charity.js"></script>
+<script src="js/marketplace.js"></script>
+<script src="js/study-hub.js"></script>
+</body>
+</html>
