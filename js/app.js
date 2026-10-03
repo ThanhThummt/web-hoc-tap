@@ -66,6 +66,10 @@ document.addEventListener('DOMContentLoaded', function () {
         const activeSection = document.getElementById(`section-${sectionName}`);
         if (activeNav) activeNav.classList.add('active');
         if (activeSection) { activeSection.style.display = 'block'; activeSection.classList.add('active'); }
+        if (sectionName === 'time-focus' && typeof TimeFocus !== 'undefined') {
+            TimeFocus.renderDeadlines();
+            TimeFocus.renderCalendar();
+        }
         localStorage.setItem('webhoctap_active_section', sectionName);
         // Close mobile sidebar
         document.getElementById('sidebar').classList.remove('open');

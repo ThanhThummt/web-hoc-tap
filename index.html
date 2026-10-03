@@ -62,15 +62,19 @@
               placeholder="Tìm kiếm tài liệu, môn học, bài viết..."
             />
           </div>
-          <button class="ai-voice-btn" id="aiVoiceBtn">🎤 Ra lệnh AI</button>
-          <div class="coin-wallet" id="coinWalletWidget">
-            🍃 <span id="topBarCoins">1.250</span> xu
-          </div>
-          <button class="notification-btn" id="notifBtn">
-            🔔<span class="notification-badge">3</span>
-          </button>
-          <div class="user-avatar" id="userAvatar">
-            👤<span class="user-name">Sinh viên</span>
+          <div class="top-bar-actions">
+            <button class="ai-voice-btn" id="aiVoiceBtn">
+              🎤 Ra lệnh AI
+            </button>
+            <div class="coin-wallet" id="coinWalletWidget">
+              🍃 <span id="topBarCoins">1.250</span> xu
+            </div>
+            <button class="notification-btn" id="notifBtn">
+              🔔<span class="notification-badge">3</span>
+            </button>
+            <div class="user-avatar" id="userAvatar">
+              👤<span class="user-name">Sinh viên</span>
+            </div>
           </div>
         </header>
 
@@ -230,9 +234,40 @@
           class="content-section"
           style="display: none"
         >
-          <div class="section-header">
-            <h1 class="section-title">⏰ Thời gian & Tập trung</h1>
+          <!-- Deadline Countdown -->
+          <h2 class="time-focus-heading">⏳ Deadline đang đến</h2>
+          <div id="deadlineCards" class="grid grid-3"></div>
+
+          <!-- Monthly Calendar -->
+          <div class="calendar-section">
+            <div class="calendar-title-row">
+              <h2 class="time-focus-heading">📅 Lịch tháng</h2>
+              <div class="calendar-controls">
+                <button
+                  class="btn btn-secondary btn-sm"
+                  id="calendarPrevMonth"
+                  aria-label="Tháng trước"
+                >
+                  ←
+                </button>
+                <span id="calendarMonthLabel" class="calendar-month-label"></span>
+                <button
+                  class="btn btn-secondary btn-sm"
+                  id="calendarNextMonth"
+                  aria-label="Tháng sau"
+                >
+                  →
+                </button>
+                <button class="btn btn-secondary btn-sm" id="calendarToday">
+                  Hôm nay
+                </button>
+              </div>
+            </div>
+            <div id="monthlyCalendar" class="card">
+              <div class="calendar-grid" id="calendarGrid"></div>
+            </div>
           </div>
+
           <!-- AI Command Bar -->
           <div class="ai-command-bar card">
             <div class="ai-command-content">
@@ -356,15 +391,6 @@
             </div>
           </div>
 
-          <!-- Deadline Countdown -->
-          <h2 style="margin: 24px 0 16px">⏳ Deadline đang đến</h2>
-          <div id="deadlineCards" class="grid grid-3"></div>
-
-          <!-- Weekly Calendar -->
-          <h2 style="margin: 24px 0 16px">📅 Lịch tuần này</h2>
-          <div id="weeklyCalendar" class="card">
-            <div class="calendar-grid" id="calendarGrid"></div>
-          </div>
         </section>
 
         <!-- ========== SECTION 3: ANALYTICS ========== -->

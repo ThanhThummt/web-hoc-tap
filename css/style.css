@@ -215,6 +215,12 @@ img {
   transform: translateY(-50%);
   font-size: 0.9rem;
 }
+.top-bar-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-left: auto;
+}
 .ai-voice-btn {
   padding: 8px 18px;
   background: linear-gradient(135deg, #ff6b6b, #ff8e53);
@@ -719,6 +725,33 @@ img {
 }
 
 /* ===== DEADLINE CARDS ===== */
+.time-focus-heading {
+  margin: 0 0 16px;
+}
+.calendar-section {
+  margin-top: 24px;
+}
+.calendar-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.calendar-title-row .time-focus-heading {
+  margin: 0;
+}
+.calendar-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.calendar-month-label {
+  min-width: 140px;
+  text-align: center;
+  font-weight: 600;
+  text-transform: capitalize;
+}
 .deadline-card {
   border-left: 4px solid var(--accent-green);
   padding: 16px 20px;
@@ -1520,7 +1553,7 @@ img {
   color: var(--text-secondary);
 }
 .calendar-day {
-  min-height: 70px;
+  min-height: 100px;
   padding: 8px;
   background: var(--bg-secondary);
   border-radius: var(--radius-sm);
@@ -1530,6 +1563,9 @@ img {
 .calendar-day.today {
   border-color: var(--primary);
   background: rgba(108, 99, 255, 0.05);
+}
+.calendar-day.outside-month {
+  opacity: 0.5;
 }
 .calendar-day-num {
   font-weight: 600;
@@ -1544,6 +1580,29 @@ img {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+@media (max-width: 600px) {
+  .calendar-title-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .calendar-controls {
+    width: 100%;
+    justify-content: space-between;
+    gap: 4px;
+  }
+  .calendar-month-label {
+    min-width: 0;
+  }
+  .calendar-day {
+    min-height: 72px;
+    padding: 4px;
+    font-size: 0.75rem;
+  }
+  .calendar-event {
+    padding: 2px;
+    font-size: 0.6rem;
+  }
 }
 
 /* ===== ICON/COLOR PICKERS ===== */
@@ -1796,6 +1855,9 @@ img {
     padding: 0 12px;
     gap: 8px;
   }
+  .top-bar-actions {
+    gap: 8px;
+  }
   .search-bar {
     max-width: 200px;
   }
@@ -1829,5 +1891,9 @@ img {
     flex-wrap: wrap;
     height: auto;
     padding: 8px 12px;
+  }
+  .top-bar-actions {
+    width: 100%;
+    justify-content: flex-end;
   }
 }

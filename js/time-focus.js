@@ -7,6 +7,7 @@ const TimeFocus = {
     timerInterval: null,
     sessionsCompleted: 0,
     currentSubject: null,
+    calendarMonth: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
 
     // Audio State
     audioCtx: null,
@@ -19,6 +20,7 @@ const TimeFocus = {
         this.setupPomodoro();
         this.setupAudioPlayer();
         this.setupAICommand();
+        this.setupCalendarControls();
         this.renderDeadlines();
         this.renderCalendar();
         // Update deadlines every minute
@@ -156,29 +158,58 @@ const TimeFocus = {
     },
 
     // ===== CALENDAR =====
+    setupCalendarControls() {
+        document.getElementById('calendarPrevMonth').addEventListener('click', () => {
+            this.calendarMonth.setMonth(this.calendarMonth.getMonth() - 1);
+            this.renderCalendar();
+        });
+        document.getElementById('calendarNextMonth').addEventListener('click', () => {
+            this.calendarMonth.setMonth(this.calendarMonth.getMonth() + 1);
+            this.renderCalendar();
+        });
+        document.getElementById('calendarToday').addEventListener('click', () => {
+            const today = new Date();
+            this.calendarMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+            this.renderCalendar();
+        });
+    },
+
     renderCalendar() {
         const grid = document.getElementById('calendarGrid');
         if (!grid) return;
 
         const today = new Date();
-        const startOfWeek = new Date(today);
-        startOfWeek.setDate(today.getDate() - today.getDay() + 1); // Monday
+        const year = this.calendarMonth.getFullYear();
+        const month = this.calendarMonth.getMonth();
+        const firstDay = new Date(year, month, 1);
+        const firstDayOffset = (firstDay.getDay() + 6) % 7;
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const cellCount = Math.ceil((firstDayOffset + daysInMonth) / 7) * 7;
+        const monthLabel = document.getElementById('calendarMonthLabel');
+        monthLabel.textContent = new Intl.DateTimeFormat('vi-VN', {
+            month: 'long',
+            year: 'numeric'
+        }).format(firstDay);
 
         const dayNames = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
         let html = dayNames.map(d => `<div class="calendar-header">${d}</div>`).join('');
 
         const tasks = typeof StudyManager !== 'undefined' ? StudyManager.getAllTasks() : [];
 
-        for (let i = 0; i < 7; i++) {
-            const day = new Date(startOfWeek);
-            day.setDate(startOfWeek.getDate() + i);
+        for (let i = 0; i < cellCount; i++) {
+            const day = new Date(year, month, 1 - firstDayOffset + i);
             const isToday = day.toDateString() === today.toDateString();
-            const dayStr = day.toISOString().split('T')[0];
+            const isOutsideMonth = day.getMonth() !== month;
+            const dayStr = [
+                day.getFullYear(),
+                String(day.getMonth() + 1).padStart(2, '0'),
+                String(day.getDate()).padStart(2, '0')
+            ].join('-');
             const dayTasks = tasks.filter(t => t.deadline === dayStr);
 
             html += `
-                <div class="calendar-day ${isToday ? 'today' : ''}">
-                    <div class="calendar-day-num">${day.getDate()}/${day.getMonth() + 1}</div>
+                <div class="calendar-day ${isToday ? 'today' : ''} ${isOutsideMonth ? 'outside-month' : ''}">
+                    <div class="calendar-day-num">${day.getDate()}</div>
                     ${dayTasks.map(t => `<div class="calendar-event" style="background:${t.subjectColor}">${t.title}</div>`).join('')}
                 </div>`;
         }
